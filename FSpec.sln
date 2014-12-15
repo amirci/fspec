@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSpec", "FSpec\FSpec.fsproj", "{AB5B9194-5F4B-49B5-BDC1-EA3043DA1BF3}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSpec.Examples", "FSpec.Examples\FSpec.Examples.fsproj", "{AF7E882B-33B7-4D64-9067-901DCED793AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB5B9194-5F4B-49B5-BDC1-EA3043DA1BF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB5B9194-5F4B-49B5-BDC1-EA3043DA1BF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB5B9194-5F4B-49B5-BDC1-EA3043DA1BF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB5B9194-5F4B-49B5-BDC1-EA3043DA1BF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF7E882B-33B7-4D64-9067-901DCED793AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF7E882B-33B7-4D64-9067-901DCED793AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF7E882B-33B7-4D64-9067-901DCED793AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF7E882B-33B7-4D64-9067-901DCED793AE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
