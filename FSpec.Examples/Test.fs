@@ -1,9 +1,12 @@
 ﻿namespace FSpec.Examples
 
-open FSpec
-
-
 module SomeTests =
+    open NUnit.Framework
+    open System.Reflection        
+
+    open FSpec
+    open Runner
+    open DSL
 
     let ``The test does something`` = describeWith (fun _ ->
 
@@ -49,41 +52,7 @@ module SomeTests =
 
     )
 
-module Runners =
-    open NUnit.Framework
-    open System.Reflection        
-    open Microsoft.FSharp.Reflection
-    open System.Text.RegularExpressions
-    open FsUnit
-                                      
+
     [<Test>]
     let ``running it`` () =
-        let onlySpecs (mi:MemberInfo) =
-            match mi with
-            | :? PropertyInfo as pi -> pi.PropertyType = typeof<TestSuite>
-            | _ -> false
-
-
-        let rec runSpec (suite:TestSuite) =
-
-            suite.Assertions
-            |> Seq.iter (fun itShould -> 
-                suite.Before()
-                printfn "%s" itShould.Message
-                itShould.Body()
-                suite.After()
-            )
-
-            suite.Children 
-            |> Seq.iter runSpec
-
-
-        let asm = System.Reflection.Assembly.GetExecutingAssembly()                    
-        asm.GetTypes()
-        |> Seq.filter(fun t -> (FSharpType.IsModule t))
-        |> Seq.map(fun t -> t.GetMembers())
-        |> Seq.concat
-        |> Seq.filter onlySpecs
-        |> Seq.map (fun mi -> (mi :?> PropertyInfo).GetValue(null) :?> TestSuite)
-        |> Seq.iter runSpec
-
+        runSpecsFrom (System.Reflection.Assembly.GetExecutingAssembly())

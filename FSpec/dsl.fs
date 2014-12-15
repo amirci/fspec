@@ -58,57 +58,49 @@ module DSL =
         let length = (Context |> Seq.length) + 1
         new System.String(c, 3 * length)
 
+    let printSpec suite =            
+        printfn "\n)))) spec --%s--" suite.Description
+
+        printfn "  >>> Assertions %d" (suite.Assertions |> Seq.length)
+        printfn "  >>> Nested %d" (suite.Nested |> Seq.length)
+        printfn "  >>> Before %O" suite.Before
+        printfn "  >>> After  %O" suite.After
+
     let private contextExp desc (f: BodyFn) =
-        printfn "%s Context ``%s``" (stars '*') desc
-        let current = {DefaultContext with 
-                        Description=desc
-                        Body=f
-                        Parent = if Context |> Stack.empty then None else Some (currentContext())
-                       }
+        let newContext = {DefaultContext with 
+                            Description=desc
+                            Body=f
+                            Parent = if Context |> Stack.empty then None else Some (currentContext())
+                           }
         Context 
-        |> Stack.push current
+        |> Stack.push newContext
         |> ignore
         f()
+        let current = Context |> Stack.peek
         Context |> Stack.pop |> ignore
         current
 
+
     let context desc f = 
-        [contextExp desc f]
-        |> List.append (currentContext().Nested)
-        |> ignore
+        currentContext().Nested <- [contextExp desc f]
+                                   |> List.append (currentContext().Nested)
 
     let describe desc (f: BodyFn) = contextExp desc f
             
     let describeWith (f: BodyFn) = contextExp "" f
 
     let before (f: BodyFn) = 
-        printfn "%s Before on current context %s" (stars('+')) (currentContext().Description)
         {currentContext() with Before = f} 
         |> updateContext
 
     let after (f: BodyFn) = 
-        printfn "%s After on current context %s" (stars('-')) (currentContext().Description)
         {currentContext() with After = f} 
         |> updateContext
 
     let it desc (f: BodyFn) =        
-        printfn "%s Assertion on current context %s" (stars('%')) (currentContext().Description)
         {currentContext() with
             Assertions = [{Body=f;Message=desc}] 
                          |> List.append (currentContext().Assertions) 
             }
         |> updateContext
 
-
-    // Spec Builder
-
-    /// Specification
-    type Spec = unit -> unit    
-     
-    type SpecBuilder() =
-                
-        member b.Delay(f : unit -> Spec) = (fun() -> f()())
-        member b.Zero() = (fun() -> ())
-        member b.Using(g : System.IDisposable, e) = () // Ignore for now... TODO Really need this!
-    
-    let spec = new SpecBuilder()
