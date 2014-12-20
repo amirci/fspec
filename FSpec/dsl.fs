@@ -7,9 +7,7 @@ module Stack =
         stack.Push(e)
         stack
 
-    let pop (stack:System.Collections.Generic.Stack<'T>) = 
-        stack.Pop() |> ignore
-        stack
+    let pop (stack:System.Collections.Generic.Stack<'T>) = stack.Pop(), stack
 
     let peek (stack:System.Collections.Generic.Stack<'T>) = stack.Peek()
 
@@ -30,7 +28,7 @@ module DSL =
         Before: BodyFn
         After: BodyFn
         Assertions: Assertion list
-        mutable Nested: ContextSpec list
+        Nested: ContextSpec list
         Parent: ContextSpec option
     }
 
@@ -51,6 +49,7 @@ module DSL =
     let private updateContext update = 
         Context
         |> Stack.pop
+        |> snd
         |> Stack.push update
         |> ignore
 
@@ -75,15 +74,18 @@ module DSL =
         Context 
         |> Stack.push newContext
         |> ignore
+        
         f()
-        let current = Context |> Stack.peek
-        Context |> Stack.pop |> ignore
-        current
-
+        
+        Context 
+        |> Stack.pop 
+        |> fst
 
     let context desc f = 
-        currentContext().Nested <- [contextExp desc f]
-                                   |> List.append (currentContext().Nested)
+        {currentContext() with 
+            Nested = [contextExp desc f] |> List.append (currentContext().Nested)
+        } 
+        |> updateContext
 
     let describe desc (f: BodyFn) = contextExp desc f
             
@@ -101,6 +103,6 @@ module DSL =
         {currentContext() with
             Assertions = [{Body=f;Message=desc}] 
                          |> List.append (currentContext().Assertions) 
-            }
+        }
         |> updateContext
 

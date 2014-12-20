@@ -7,6 +7,39 @@ module Runner =
 
     open DSL
 
+    let runSpec = 
+        let runAssertion spec tabs assertion = 
+            printfn "%s %s" tabs assertion.Message
+
+            spec.Before()
+
+            let status = try 
+                            assertion.Body()
+                            "Success!"
+                         with
+                            | ex -> "Failed!"
+
+            printfn "%s %s" tabs status
+
+            spec.After()
+
+        let rec runSpecWithLevel nestLevel (suite:TestSuite) =
+
+            let tabs = new System.String(' ', 3 * nestLevel)
+
+            printfn "%s %s" tabs suite.Description
+
+            let tabs = new System.String(' ', 3 * (nestLevel + 1))
+
+            suite.Assertions
+            |> Seq.iter (runAssertion suite tabs) 
+            
+            suite.Nested 
+            |> Seq.iter (runSpecWithLevel (nestLevel + 1))
+
+
+        runSpecWithLevel 0
+
     let runSpecsFrom (asm:Assembly) =                                      
         let onlySpecs (mi:MemberInfo) =
             match mi with
@@ -14,26 +47,15 @@ module Runner =
             | _ -> false
 
 
-        let rec runSpec (suite:TestSuite) =
-
-            suite.Assertions
-            |> Seq.iter (fun itShould -> 
-                suite.Before()
-                printfn "%s" itShould.Message
-                itShould.Body()
-                suite.After()
-            )
-
-            
-            suite.Nested 
-            |> Seq.iter runSpec
-
-
         asm.GetTypes()
         |> Seq.filter(fun t -> (FSharpType.IsModule t))
         |> Seq.map(fun t -> t.GetMembers())
         |> Seq.concat
         |> Seq.filter onlySpecs
-        |> Seq.map (fun mi -> (mi :?> PropertyInfo).GetValue(null) :?> TestSuite)
+        |> Seq.map (fun mi -> 
+            let pi = mi :?> PropertyInfo
+            let suite = pi.GetValue(null) :?> TestSuite
+            {suite with Description = pi.Name}
+            )
         |> Seq.iter runSpec
 
