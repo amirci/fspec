@@ -22,17 +22,17 @@ module DSL =
 
     type Assertion = {Body:BodyFn; Message:string}
 
-    type ContextSpec = {
+    type Spec = {
         Description:string
         Body: BodyFn
         Before: BodyFn
         After: BodyFn
         Assertions: Assertion list
-        Nested: ContextSpec list
-        Parent: ContextSpec option
+        Nested: Spec list
+        Parent: Spec option
     }
 
-    type TestSuite = ContextSpec
+    type TestSuite = Spec
 
     let private DefaultContext = {Description = ""; 
                     Body        = EmptyFn;
@@ -42,7 +42,7 @@ module DSL =
                     Nested      = [];
                     Parent      = None}
 
-    let mutable private Context = Stack.create<ContextSpec>()
+    let mutable private Context = Stack.create<Spec>()
 
     let private currentContext() = Context |> Stack.peek
 

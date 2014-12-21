@@ -1,44 +1,114 @@
 ﻿namespace FSpec
 
-module Runner =
+module SpecRunner =
 
     open Microsoft.FSharp.Reflection
     open System.Reflection        
+    open System.IO
 
     open DSL
 
-    let runSpec = 
-        let runAssertion spec tabs assertion = 
-            printfn "%s %s" tabs assertion.Message
+    type Events =
+        | AssertionStart of string
+        | AssertionPassed
+        | AssertionFailed of System.Exception
+        | SpecStart
+        | SpecEnd
+        | ContextStart
+        | SuiteStarts
 
-            spec.Before()
+    type Context = {Parents:TestSuite list; Notifier: INotifier} with
 
-            let status = try 
-                            assertion.Body()
-                            "Success!"
-                         with
-                            | ex -> "Failed!"
+        member this.Description = match this.Parents with
+                                    | p::xs -> p.Description
+                                    | _ -> ""
 
-            printfn "%s %s" tabs status
+    and INotifier =
+        abstract member Notify: Events -> Context -> unit
 
-            spec.After()
+    type SilentNotifications() =
+        interface INotifier with
+            member this.Notify event ctxt = ()
 
-        let rec runSpecWithLevel nestLevel (suite:TestSuite) =
+    type NotifyToWriter (writer:TextWriter) =
+        let writeIndented nestLevel msg = 
+            let indent = new System.String(' ', 3 * nestLevel)
+            writer.WriteLine(sprintf "%s%s" indent msg) 
 
-            let tabs = new System.String(' ', 3 * nestLevel)
+        interface INotifier with
+            member this.Notify event ctxt = 
+                let nestLevel = (ctxt.Parents |> Seq.length)
+                let write = writeIndented nestLevel
 
-            printfn "%s %s" tabs suite.Description
+                match event with
+                | AssertionStart msg -> write msg
+                | AssertionPassed    -> write "Passed!"
+                | AssertionFailed e  -> write "Failed!"
+                | ContextStart       -> write ctxt.Description 
+                | _                  -> ()
 
-            let tabs = new System.String(' ', 3 * (nestLevel + 1))
+    module Notify =
 
-            suite.Assertions
-            |> Seq.iter (runAssertion suite tabs) 
+        let notify event ctx = 
+            ctx.Notifier.Notify event ctx
+            ctx
+
+        let assertion message = notify (AssertionStart(message))
+
+        let passed = notify AssertionPassed
+
+        let failed e = notify (AssertionFailed(e))
+
+        let context = notify ContextStart
+
+    [<AutoOpen>]
+    module private TestContext =
+        let before (spec:Spec) = spec.Before()
+        let after  (spec:Spec) = spec.After()
+
+        let Default = {Parents=[];Notifier=SilentNotifications()}
+
+        let addParent spec ctx = {ctx with Parents=spec::ctx.Parents}
+
+    module Ancestors =
+        
+        let iter fn ctx =
+            ctx.Parents 
+            |> List.rev 
+            |> List.iter fn
+
+            ctx
+
+    let private run (ctx:Context) (assertion:Assertion) = 
+        
+        let eval ctx =
+            ctx
+            |> try assertion.Body(); Notify.passed
+               with
+               | ex -> Notify.failed ex
+
+        ctx 
+        |> Notify.assertion assertion.Message
+        |> Ancestors.iter before
+        |> eval
+        |> Ancestors.iter after
+        |> ignore
+
+    let rec private runSpecWithContext (ctx:Context) (spec:Spec) =
+
+        let runAssertions ctx = spec.Assertions |> Seq.iter (run ctx) ; ctx
             
-            suite.Nested 
-            |> Seq.iter (runSpecWithLevel (nestLevel + 1))
+        let runNestedSpecs ctx = spec.Nested |> Seq.iter (runSpecWithContext ctx)
+        
+        ctx 
+        |> addParent spec
+        |> Notify.context
+        |> runAssertions
+        |> runNestedSpecs
 
 
-        runSpecWithLevel 0
+    let runSpec = runSpecWithContext {TestContext.Default with 
+                                        Notifier=NotifyToWriter System.Console.Out}
 
     let runSpecsFrom (asm:Assembly) =                                      
         let onlySpecs (mi:MemberInfo) =

@@ -6,7 +6,7 @@ module ``How before and after work`` =
     open FsUnit
 
     open FSpec
-    open Runner
+    open SpecRunner
     open DSL
 
     let ``This is a test of describe`` = describeWith (fun _ ->
