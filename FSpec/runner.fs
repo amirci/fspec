@@ -70,8 +70,14 @@ module SpecRunner =
 
         let addParent spec ctx = {ctx with Parents=spec::ctx.Parents}
 
+    module Parents =
+        let iter fn ctx =
+            ctx.Parents 
+            |> List.iter fn
+
+            ctx
+
     module Ancestors =
-        
         let iter fn ctx =
             ctx.Parents 
             |> List.rev 
@@ -91,7 +97,7 @@ module SpecRunner =
         |> Notify.assertion assertion.Message
         |> Ancestors.iter before
         |> eval
-        |> Ancestors.iter after
+        |> Parents.iter after
         |> ignore
 
     let rec private runSpecWithContext (ctx:Context) (spec:Spec) =
