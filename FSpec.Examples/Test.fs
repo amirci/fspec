@@ -1,51 +1,53 @@
 ﻿namespace FSpec.Examples
 
-module SomeTests =
+module ``How before and after work`` =
     open NUnit.Framework
     open System.Reflection        
+    open FsUnit
 
     open FSpec
-    open Runner
+    open SpecRunner
     open DSL
 
-    let ``The test does something`` = describeWith (fun _ ->
+    let ``This is a test of describe`` = describeWith (fun _ ->
 
         before (fun _ ->
-            printfn "This runs before"
+            printfn "Before each test (on main context)"
         )
 
         after (fun _ -> 
-            printfn "This runs after"
+            printfn "After each test (on main context)"
         )
 
-        context "when the path is something" (fun _ -> 
+        context "When we are on the first scenario" (fun _ -> 
         
-            it "does what we expected" (fun _ ->
-                printfn "Indeed it does"
+            it "First assertion on scenario #1" (fun _ ->
+                true |> should be True
             )
 
-            it "does something else" (fun _ ->
-                printfn "Indeed is something else"
+            it "Second assertion on scenario #2" (fun _ ->
+                1 + 2 |> should equal 3
             )
         )
 
-        context "when the path is other" (fun _ -> 
+        context "When we are on the second scenario" (fun _ -> 
         
-            it "does what it didn't do" (fun _ ->
-                printfn "It didn't do it or I would know"
+            it "First Assertion on Scenario #2" (fun _ ->
+                "Fspec" |> should contain "spec"
             )
 
-            context "and the branch happens" (fun _ ->
+            context "and the first branch happens" (fun _ ->
             
                 before (fun _ ->
-                    printfn "before the branch"
+                    printfn "Before the branch #1 of scenario #2"
                 )
 
                 after (fun _ ->
-                    printfn "after the branch"
+                    printfn "After the branch #1 of scenario #2"
                 )
-                it "went the to branch" (fun _ ->
-                    printfn "and did the branch too"
+
+                it "First assertion on branch #1 scneario #2" (fun _ ->
+                    1 + 2 |> should equal 4
                 )
             )
         )

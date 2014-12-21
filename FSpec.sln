@@ -7,6 +7,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSpec", "FSpec\FSpec.fsproj
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSpec.Examples", "FSpec.Examples\FSpec.Examples.fsproj", "{AF7E882B-33B7-4D64-9067-901DCED793AE}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSpec.Tests", "FSpec.Tests\FSpec.Tests.fsproj", "{8E3EA0E9-DF7F-448C-B7E7-0FD7B4851490}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{AF7E882B-33B7-4D64-9067-901DCED793AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF7E882B-33B7-4D64-9067-901DCED793AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF7E882B-33B7-4D64-9067-901DCED793AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E3EA0E9-DF7F-448C-B7E7-0FD7B4851490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E3EA0E9-DF7F-448C-B7E7-0FD7B4851490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E3EA0E9-DF7F-448C-B7E7-0FD7B4851490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E3EA0E9-DF7F-448C-B7E7-0FD7B4851490}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
