@@ -27,6 +27,8 @@ module DSL =
         Body: BodyFn
         Before: BodyFn
         After: BodyFn
+        BeforeAll: BodyFn
+        AfterAll: BodyFn
         Assertions: Assertion list
         Nested: Spec list
         Parent: Spec option
@@ -38,6 +40,8 @@ module DSL =
                     Body        = EmptyFn;
                     Before      = EmptyFn;
                     After       = EmptyFn;
+                    BeforeAll   = EmptyFn;
+                    AfterAll    = EmptyFn;
                     Assertions  = [];
                     Nested      = [];
                     Parent      = None}
@@ -90,6 +94,10 @@ module DSL =
     let describe desc (f: BodyFn) = contextExp desc f
             
     let describeWith (f: BodyFn) = contextExp "" f
+
+    let beforeAll(f:BodyFn) =
+        {currentContext() with BeforeAll = f} 
+        |> updateContext
 
     let before (f: BodyFn) = 
         {currentContext() with Before = f} 

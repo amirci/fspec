@@ -50,6 +50,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AfterEach.Tests.fs" />
+    <Compile Include="BeforeAll.Tests.fs" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
     <Compile Include="BeforeEach.Tests.fs" />
