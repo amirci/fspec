@@ -106,9 +106,12 @@ module SpecRunner =
             
         let runNestedSpecs ctx = spec.Nested |> Seq.iter (runSpecWithContext ctx)
         
+        let beforeAll ctx = spec.BeforeAll(); ctx
+
         ctx 
         |> addParent spec
         |> Notify.context
+        |> beforeAll
         |> runAssertions
         |> runNestedSpecs
 
