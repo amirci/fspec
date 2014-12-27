@@ -104,9 +104,11 @@ module SpecRunner =
 
         let runAssertions ctx = spec.Assertions |> Seq.iter (run ctx) ; ctx
             
-        let runNestedSpecs ctx = spec.Nested |> Seq.iter (runSpecWithContext ctx)
+        let runNestedSpecs ctx = spec.Nested |> Seq.iter (runSpecWithContext ctx) ; ctx
         
         let beforeAll ctx = spec.BeforeAll(); ctx
+        
+        let afterAll ctx = spec.AfterAll()
 
         ctx 
         |> addParent spec
@@ -114,10 +116,16 @@ module SpecRunner =
         |> beforeAll
         |> runAssertions
         |> runNestedSpecs
+        |> afterAll
 
 
     let runSpec = runSpecWithContext {TestContext.Default with 
                                         Notifier=NotifyToWriter System.Console.Out}
+
+    let runSpecWithConfig (cfg:Context -> Context) = 
+        runSpecWithContext (cfg TestContext.Default)
+        
+
 
     let runSpecsFrom (asm:Assembly) =                                      
         let onlySpecs (mi:MemberInfo) =

@@ -107,6 +107,10 @@ module DSL =
         {currentContext() with After = f} 
         |> updateContext
 
+    let afterAll(f:BodyFn) =
+        {currentContext() with AfterAll = f} 
+        |> updateContext
+
     let it desc (f: BodyFn) =        
         {currentContext() with
             Assertions = [{Body=f;Message=desc}] 

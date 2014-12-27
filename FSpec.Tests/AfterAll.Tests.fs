@@ -5,14 +5,15 @@ open SpecRunner
 open FsUnit
 open NUnit.Framework
 
-module ``'Before all' tests`` =
+
+module ``'After all' tests`` =
 
     [<Test>]
-    let ``Runs the 'before all fn' before all the assertions`` () =
+    let ``Runs the 'after all' after all the assertions`` () =
         arrangeSteps()
 
         runSpec (describeWith (fun _ ->
-            beforeAll (step 1)
+            afterAll (step 100)
 
             it "Asserts something" (step 2)
 
@@ -21,15 +22,15 @@ module ``'Before all' tests`` =
             it "Asserts something even further" (step 4)
         ))
 
-        theSteps() |> should equal [1;2;3;4]
+        theSteps() |> should equal [2;3;4;100]
 
 
     [<Test>]
-    let ``Runs the 'before fn' before all assertions context`` () =
+    let ``Runs the 'after all fn' after all assertions context`` () =
         arrangeSteps()
 
         runSpec (describeWith (fun _ ->
-            beforeAll (step 1)
+            afterAll (step 100)
 
             it "Asserts something" (step 2)
 
@@ -37,7 +38,7 @@ module ``'Before all' tests`` =
 
             context "First nested context" (fun _ ->
     
-                beforeAll (step 4)
+                afterAll (step 200)
                         
                 it "Asserts something even further" (step 5)
 
@@ -45,5 +46,5 @@ module ``'Before all' tests`` =
             )
         ))
 
-        theSteps() |> should equal [1;2;3;4;5;6]
+        theSteps() |> should equal [2;3;5;6;200;100]
 

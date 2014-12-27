@@ -9,7 +9,7 @@ module ``How before and after work`` =
     open SpecRunner
     open DSL
 
-    let ``This is a test of describe`` = describeWith (fun _ ->
+    let sut = describeWith (fun _ ->
 
         before (fun _ ->
             printfn "Before each test (on main context)"
@@ -36,7 +36,7 @@ module ``How before and after work`` =
                 "Fspec" |> should contain "spec"
             )
 
-            context "and the first branch happens" (fun _ ->
+            context "and the first branch happens" (fun ctx ->
             
                 before (fun _ ->
                     printfn "Before the branch #1 of scenario #2"
@@ -56,5 +56,21 @@ module ``How before and after work`` =
 
 
     [<Test>]
-    let ``running it`` () =
-        runSpecsFrom (System.Reflection.Assembly.GetExecutingAssembly())
+    let ``All the before and after are shown as expected`` () =
+        let messages = new System.Collections.Generic.List<string>()
+
+        let notifier = {new INotifier with
+            member this.Notify event ctxt = 
+                let msg = match event with
+                            | AssertionStart msg -> msg
+                            | AssertionPassed    -> "Passed!"
+                            | AssertionFailed e  -> "Failed!"
+                            | ContextStart       -> ctxt.Description 
+                            | _                  -> ""
+
+                messages.Add(msg)
+        }
+
+        sut |> runSpecWithConfig (fun ctx -> {ctx with Notifier=notifier}) 
+
+        messages |> should equal ["something"]

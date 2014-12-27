@@ -5,18 +5,10 @@ open SpecRunner
 open FsUnit
 open NUnit.Framework
 
-module ``Before each tests`` =
-
-    let mutable steps:int list = []
-
-    let step i _ = steps <- i :: steps
-
-    let arrangeSteps _ = steps <- []
-
-    let theSteps () = steps |> List.rev
+module ``'Before each' tests`` =
 
     [<Test>]
-    let ``Runs the before fn before each assertion`` () =
+    let ``Runs the 'before fn' before each assertion`` () =
         arrangeSteps()
 
         runSpec (describeWith (fun _ ->
@@ -33,7 +25,7 @@ module ``Before each tests`` =
 
 
     [<Test>]
-    let ``Runs the before fn before each nested context`` () =
+    let ``Runs the 'before fn' before each nested context`` () =
         arrangeSteps()
 
         runSpec (describeWith (fun _ ->
@@ -54,7 +46,7 @@ module ``Before each tests`` =
         theSteps() |> should equal [1;2;1;3;1;4;5]
 
     [<Test>]
-    let ``Runs the before fn before multiple nested contexts`` () =
+    let ``Runs the 'before fn' before multiple nested contexts`` () =
         arrangeSteps()
 
         runSpec (describeWith (fun _ ->
